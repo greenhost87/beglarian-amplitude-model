@@ -7,5 +7,6 @@ case class AmplitudeUserProperties(
     lastName: Option[String],
     businessId: Option[String],
     date: Option[Long],
-    role: String
+    role: String,
+    custom: Map[String, String]
 )

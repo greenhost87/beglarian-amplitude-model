@@ -81,14 +81,25 @@ object AmplitudeProtocol extends DefaultJsonProtocol {
     }
 
   implicit val amplitudeUserPropertiesFormat: RootJsonFormat[AmplitudeUserProperties] =
-    jsonFormat(
-      AmplitudeUserProperties.apply,
-      "email",
-      "phone",
-      "first_name",
-      "last_name",
-      "business_id",
-      "date",
-      "role"
-    )
+    new RootJsonFormat[AmplitudeUserProperties] {
+      override def read(json: JsValue): AmplitudeUserProperties = {
+        throw new NotImplementedError("Write only formatter")
+      }
+
+      override def write(aup: AmplitudeUserProperties): JsValue = {
+        val raw: Seq[(String, JsValue)] = Seq(
+          aup.email.map(v => "email" -> v.toJson),
+          aup.phone.map(v => "phone" -> v.toJson),
+          aup.firstName.map(v => "first_name" -> v.toJson),
+          aup.lastName.map(v => "last_name" -> v.toJson),
+          aup.businessId.map(v => "business_id" -> v.toJson),
+          aup.date.map(v => "date" -> v.toJson),
+          Some("role" -> aup.role.toJson),
+        ).flatten ++ aup.custom.map { case (key, value) =>
+          key -> value.toJson
+        }
+
+        JsObject(raw: _*)
+      }
+    }
 }
